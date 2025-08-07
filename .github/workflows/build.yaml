@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/theos/theos:latest
+  image: ghcr.io/schneelittchen/theos:latest
 
     steps:
     - name: Checkout code
