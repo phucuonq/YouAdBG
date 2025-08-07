@@ -1,0 +1,31 @@
+name: Build YouAdBG Tweak
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/theos/theos:latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Theos environment variables
+      run: |
+        echo "THEOS=/opt/theos" >> $GITHUB_ENV
+
+    - name: Build tweak
+      run: |
+        make clean
+        make
+
+    - name: Upload .deb package
+      uses: actions/upload-artifact@v4
+      with:
+        name: YouAdBG.deb
+        path: packages/*.deb
