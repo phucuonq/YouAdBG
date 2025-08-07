@@ -1,31 +1,36 @@
-name: Build YouAdBG Tweak
+name: build
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/schneelittchen/theos:latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-    - name: Set up Theos environment variables
-      run: |
-        echo "THEOS=/opt/theos" >> $GITHUB_ENV
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y curl git make perl clang ldid dpkg fakeroot zip unzip
 
-    - name: Build tweak
-      run: |
-        make clean
-        make
+      - name: Set up Theos
+        run: |
+          git clone --recursive https://github.com/theos/theos.git $HOME/theos
+          echo "export THEOS=$HOME/theos" >> $GITHUB_ENV
 
-    - name: Upload .deb package
-      uses: actions/upload-artifact@v4
-      with:
-        name: YouAdBG.deb
-        path: packages/*.deb
+      - name: Build tweak
+        run: |
+          make clean package
+        env:
+          THEOS: ${{ env.THEOS }}
+
+      - name: Upload deb file
+        uses: actions/upload-artifact@v4
+        with:
+          name: tweak-deb
+          path: ./packages/*.deb
